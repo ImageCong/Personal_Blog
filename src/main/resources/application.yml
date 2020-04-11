@@ -1,0 +1,38 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/light_blog?useUnicode=true&characterEncoding=utf8&serverTimezone=GMT
+    type: com.alibaba.druid.pool.DruidDataSource
+
+  thymeleaf:
+    mode: HTML
+    filters: stat,wall,logback
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+
+
+mybatis:
+  type-aliases-package: com.example.demo.entity
+  mapper-locations: classpath:mapper/*.xml
+
+logging:
+  level:
+    root: info
+  file:
+    name: log/blog.log
+
+comment:
+  avatar: /images/avat.png

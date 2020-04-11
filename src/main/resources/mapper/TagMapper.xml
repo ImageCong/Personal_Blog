@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.TagMapper">
+
+    <!--新增标签-->
+    <insert id="saveTag">
+        INSERT INTO t_tag(id,name)
+        VALUES (#{tag.id},#{tag.name})
+    </insert>
+
+
+    <!--获取标签-->
+    <select id="getTag" resultType="com.example.demo.entity.Tag">
+        SELECT id,name FROM t_tag
+        WHERE id=#{id}
+    </select>
+
+    <!--根据名称获取标签-->
+    <select id="getTagByName" resultType="com.example.demo.entity.Tag">
+        SELECT id,name FROM t_tag
+        WHERE name=#{name}
+    </select>
+
+    <!--分页查询，利用了PageHelper-->
+    <select id="listTag" resultType="com.example.demo.entity.Tag">
+        SELECT id,name FROM t_tag
+    </select>
+
+    <select id="listTagWithCondition" resultType="com.example.demo.entity.Tag">
+        SELECT id,name FROM t_tag
+        <where>
+            id in
+            <foreach item="id" index="index" collection="ids"
+                     open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+
+    <!--更新标签-->
+    <update id="updateTag">
+        UPDATE t_tag SET
+            id=#{tag.id},name=#{tag.name}
+        WHERE id=#{id}
+    </update>
+
+    <!--删除标签-->
+    <delete id="deleteTag">
+        DELETE FROM t_tag
+        WHERE id=#{id}
+    </delete>
+</mapper>

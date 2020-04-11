@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.BlogTagsMapper">
+
+    <!--查到此博客的所有标签-->
+    <resultMap id="findAllTagsRM" type="com.example.demo.entity.Tag">
+        <id property="id" column="tags_id"></id>
+    </resultMap>
+    <select id="findAllTags" resultMap="findAllTagsRM">
+        SELECT tags_id FROM t_blog_tags
+        WHERE blogs_id=#{blog.id}
+    </select>
+
+
+    <!--查到具有此标签的所有博客-->
+    <resultMap id="findAllBlogRM" type="com.example.demo.entity.Blog">
+        <id property="id" column="blogs_id"></id>
+    </resultMap>
+    <select id="findAllBlog" resultMap="findAllBlogRM">
+        SELECT  blogs_id FROM t_blog_tags
+        WHERE tags_id=#{tag.id}
+    </select>
+
+
+    <insert id="saveBlogsAndTags">
+        INSERT INTO  t_blog_tags(blogs_id,tags_id)
+        VALUES (#{blog.id},#{tag.id})
+    </insert>
+
+    <delete id="deleteRealtionTags">
+        DELETE FROM t_blog_tags
+        WHERE blogs_id=#{blog.id}
+    </delete>
+
+    <delete id="deleteRealtionBlogs">
+        DELETE FROM t_blog_tags
+        WHERE tags_id=#{tag.id}
+    </delete>
+
+</mapper>

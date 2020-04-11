@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.mapper.BlogMapper">
+
+    <!--写博客-->
+
+    <insert id="saveBlog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_blog(title,content,first_picture,flag,views,
+        appreciation,share_statement,commentabled,published,recommend,
+        create_time,update_time,type_id,user_id,description)
+        VALUES (#{blog.title},#{blog.content},#{blog.firstPicture},
+        #{blog.flag},#{blog.views},#{blog.appreciation},#{blog.shareStatement},
+        #{blog.commentabled},#{blog.published},#{blog.recommend},#{blog.createTime},
+        #{blog.updateTime},#{blog.type.id},#{blog.user.id},#{blog.description})
+    </insert>
+
+
+    <!--获取博客-->
+
+    <resultMap id="getBlogRM" type="com.example.demo.entity.Blog">
+        <id property="id" column="id"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="firstPicture" column="first_picture"/>
+
+        <association property="type"
+                     select="com.example.demo.mapper.TypeMapper.getType"
+                     column="type_id"
+        />
+
+        <association property="user"
+                     select="com.example.demo.mapper.UserMapper.getUser"
+                     column="user_id"
+        />
+    </resultMap>
+    <select id="getBlog" resultMap="getBlogRM">
+        SELECT * FROM t_blog
+        WHERE id=#{id}
+    </select>
+
+
+    <!--根据type_id得到博客-->
+    <select id="getBlogByTypeId" resultType="com.example.demo.entity.Blog">
+        SELECT id,title FROM t_blog
+        WHERE type_id =
+            (SELECT id FROM t_type WHERE id = #{id})
+    </select>
+
+
+    <!--根据title获取博客-->
+    <select id="getBlogByTitle" resultType="com.example.demo.entity.Blog">
+        SELECT * FROM t_blog
+        WHERE title LIKE #{title} LIMIT 1
+    </select>
+
+    <!--分页查询，利用了PageHelper-->
+    <resultMap id="listBlogRM" type="com.example.demo.entity.Blog">
+        <id property="id" column="id"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="firstPicture" column="first_Picture"/>
+
+        <association property="type"
+                     select="com.example.demo.mapper.TypeMapper.getType"
+                     column="type_id"
+        />
+
+        <association property="user"
+                     select="com.example.demo.mapper.UserMapper.getUser"
+                     column="user_id"
+        />
+    </resultMap>
+    <select id="listBlog" resultMap="listBlogRM">
+        SELECT * FROM t_blog
+        <where>
+            <if test="title != null">
+                title LIKE #{title}"%"
+            </if>
+            <if test="type != null">
+                AND type_id=#{type.id}
+            </if>
+            <if test="recommend == true">
+                AND recommend=#{recommend}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="listRecommendBlog" resultType="com.example.demo.entity.Blog">
+        SELECT * FROM t_blog
+        WHERE recommend=true
+        ORDER BY update_time DESC
+    </select>
+
+    <update id="updateBlog">
+        UPDATE t_blog
+        <trim prefix="set" suffixOverrides=",">
+            <if test="blog.title != null">title=#{blog.title},</if>
+            <if test="blog.content != null">content=#{blog.content},</if>
+            <if test="blog.firstPicture != null">first_picture=#{blog.firstPicture},</if>
+            <if test="blog.flag != null">flag=#{blog.flag},</if>
+            <if test="blog.views != null">views=#{blog.views},</if>
+            <if test="blog.appreciation != null">appreciation=#{blog.appreciation},</if>
+            <if test="blog.shareStatement != null">share_statement=#{blog.shareStatement},</if>
+            <if test="blog.commentabled != null">commentabled=#{blog.commentabled},</if>
+            <if test="blog.published != null">published=#{blog.published},</if>
+            <if test="blog.recommend != null">recommend=#{blog.recommend},</if>
+            <if test="blog.createTime != null">create_time=#{blog.createTime},</if>
+            <if test="blog.updateTime != null">update_time=#{blog.updateTime},</if>
+            <if test="blog.type != null">type_id=#{blog.type.id},</if>
+            <if test="blog.user != null">user_id=#{blog.user.id},</if>
+            <if test="blog.description != null">description=#{blog.description}</if>
+        </trim>
+        WHERE id=#{id}
+    </update>
+
+    <!-- 获取全部的年份 -->
+    <select id="getCreateTime" resultType="String">
+        SELECT DATE_FORMAT(b.create_time,'%Y') as year FROM t_blog b
+        GROUP BY year ORDER BY year DESC
+    </select>
+
+    <!-- 根据年份列出博客 -->
+    <select id="listBlogByCreateTime" resultMap="listBlogRM">
+        SELECT * FROM t_blog b
+        WHERE DATE_FORMAT(b.create_time,'%Y') = #{date}
+    </select>
+
+    <select id="countBlogs" resultType="int">
+        SELECT count(1) FROM t_blog
+    </select>
+
+    <!-- 增加浏览次数 -->
+    <update id="updateViews">
+        UPDATE t_blog
+        SET  views = views+1
+        WHERE id=#{id}
+    </update>
+
+    <!--删除标签-->
+    <delete id="deleteBlog">
+        DELETE FROM t_blog
+        WHERE id=#{id}
+    </delete>
+</mapper>
